@@ -6,7 +6,9 @@
             <span class="user_number">3232人观看</span>
             <div class="barrage">
                 <div class="_rc">
-                    <div v-for="(item,index) in barrageList" :key="index">{{item}}</div>
+                    <div v-for="(item,index) in barrageList" :key="index">
+                        <span>{{item}}</span>
+                    </div>
                 </div>
             </div>
             <div class="send_box">
@@ -77,6 +79,7 @@ export default {
 </script>
 <style lang="less" scoped>
 .content{
+    background: #eee;
     position: absolute;
     width: 100%;
     height: 100%;
