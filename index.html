@@ -3,6 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta http-equiv="Access-Control-Allow-Origin" content="*">
     <script type="text/javascript" charset="utf-8" src="//g.alicdn.com/sd/nch5/index.js?t=2015052012"></script>
     <script type="text/javascript" src="https://g.alicdn.com/de/prismplayer/2.7.2/aliplayer-min.js"></script>
     <link rel="stylesheet" href="https://g.alicdn.com/de/prismplayer/2.7.2/skins/default/aliplayer-min.css" />
@@ -31,6 +32,9 @@
 var html = document.documentElement;  
 
 var windowWidth = html.clientWidth;  
+if(windowWidth>750){
+  windowWidth = 750;
+}
 
 html.style.fontSize = windowWidth /7.5+ 'px';   
 

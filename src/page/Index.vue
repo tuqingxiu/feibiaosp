@@ -2,8 +2,20 @@
 <div id="sp_container" class="container" :style="clientH">
     <div class="f_video" @click="chickLogin">
         <div class="content">
-            <div class="follow_box" flex="dir:left"><span>缅甸翡翠代购</span><span>关注</span></div>
-            <span class="user_number">{{viewCount}}人观看</span>
+            <div class="ad" v-if="isAd">
+                <img class="ad_img" src="../image/ad.png"/>
+                <img class="ad_close" @click="closeAd" src="../image/close1.png" />
+            </div>
+            <div class="follow_box" flex="dir:left cross:center main:left">
+                <img src="../image/zan.png"/>
+                <div flex="dir:top">
+                    <span class="store_name">云南翡翠世家啦啦啦</span>
+                    <span class="view_number">{{viewCount}}人观看</span>
+                </div>
+                <span class="follow_btn" :class="{active:isFollow}">
+                    {{isFollow ? '已关注':'关注'}}
+                </span>
+            </div>
             <div class="barrage">
                 <div class="_rc">
                     <div class="_rc_l" v-for="(item,index) in barrageList" :key="index">
@@ -19,7 +31,11 @@
                 <span>{{likeCount}}</span>
                 <img src="../image/zan.png" />
             </div>
-            <div id="more" class="more" @click="lookMoreRoom">更多源头工厂正在直播</div>
+            <div id="more" class="more" @click="lookMoreRoom" flex="dir:left cross:center main:center">
+                <img src="../image/line.png"/>
+                <span>更多源头工厂正在直播</span>
+                <img src="../image/line.png"/>
+            </div>
         </div>
         <div class="player_box" :style="clientH">
             <div class="prism-player" id="J_prismPlayer" style="position: absolute" :style="clientH"></div>
@@ -29,12 +45,17 @@
     <div class="room_list" flex="dir:left">
         <div class="room" v-for="(r,i) in liveRooms" :key="i">
             <img class="r_img" :src="r.image"/>
-            <img class="live_img" src="../image/live.png"/>
-            <img class="zan_img" src="../image/zan.png"/>
+            <div class="live_box" flex="dir:left cross:center">
+                <img class="live_img" src="../image/live.png"/>
+                <span class="r_number">3213观看</span>
+            </div>
+            <img class="zan_img" src="../image/zan1.png"/>
             <span class="name">{{r.name}}</span>
         </div>
     </div>
-    <Login v-if="showLogin" :callback="chickLogin.bind(this)"></Login>
+    <div class="download_btn" v-if="downloadBtn">下载翡标奢品APP，享受直播购物盛典</div>
+    <Login v-if="showLogin"></Login>
+    <DownLoad v-if="showDownLoad"></DownLoad>
 </div>
 
 </template>
@@ -42,9 +63,13 @@
 import { MessageBox  } from 'mint-ui';
 import $ from 'jquery';
 import Login from './Login';
+import DownLoad from './DownLoad';
+import store from '../store';
+import {mapState, mapMutations} from "vuex";
 export default {
     components: {
-        Login
+        Login,
+        DownLoad
     },
     data(){
         return{
@@ -106,13 +131,48 @@ export default {
             viewCount: 5,//观看人数
             likeCount: 123,//点赞次数
             sendMsg: '',//要发送的消息
-            showLogin: false
+            isFollow: false,//是否已关注
+            isAd: true,//是否显示广告
+            downloadBtn: false, //显示底部下载按钮
         }
     },
+    computed: {
+        ...mapState({
+            isLogin:({ common }) => common.isLogin,
+            showLogin:({ common }) => common.showLogin,
+            showDownLoad:({common}) => common.showDownLoad
+        })
+    },
     mounted: function() {
+        //初始化video
         this.initVideo();
+        //监听滚动出现下载按钮
+        this.$el.addEventListener('scroll', this.handleScroll);
+        //循环弹窗
+        this.downloadBox();
     },
     methods: {
+        ...mapMutations({
+            toggleShowLogin: "SHOW_LOGIN",
+            toggleshowDownLoad: "SHOW_DOWNLOAD"
+        }),
+        handleScroll: function(){
+            var scrollTop = this.$el.scrollTop;
+            if(scrollTop > 180){
+                this.downloadBtn = true;
+            }else{
+                this.downloadBtn = false;
+            }
+        },
+        downloadBox: function(){
+            //循环弹窗
+            let that = this;
+            let timer = setInterval(()=>{
+                if(!that.showLogin && !that.showDownLoad){
+                    that.toggleshowDownLoad(true);
+                }
+            },60000);
+        },
         getNewMsg: function(){
             if(this.barrageList.length>10){
                 this.barrageList.shift();
@@ -149,8 +209,15 @@ export default {
                 this.$el.scrollTop = clientH -moreH;
             })
         },
+        //检查是否登录，是否弹出登录框
         chickLogin: function(){
-            this.showLogin = !this.showLogin;
+            if(!this.isLogin){
+                this.toggleShowLogin();
+            }
+        },
+        //关闭广告
+        closeAd: function(){
+            this.isAd = false;
         }
     },
     watch: {
@@ -179,11 +246,54 @@ export default {
         left: 0;
         z-index: 101;
         font-size: 0.32rem;
-        .follow_box{
-            background: #fff;
+        .ad{
+            position: relative;
+            .ad_img{
+                width: 100%;
+                max-height: 3rem;
+            }
+            .ad_close{
+                position: absolute;
+                top: 50%;
+                right: .2rem;
+                transform: translateY(-50%);
+                width: .48rem;
+            }
         }
-        .user_number{
-            background: #fff;
+        .follow_box{
+            color: #fff;
+            background: fade(hsl(0, 0, 0), 10%);
+            padding: .1rem .2rem;
+            display: inline-flex;
+            border-radius: 0 .8rem .8rem 0;
+            margin-top: .1rem;
+            img{
+                width:.6rem;
+                height: .6rem;
+                border-radius: .3rem;
+                background: red;
+                margin-right: .1rem;
+            }
+            .store_name{
+                font-size: .24rem;
+            }
+            .view_number{
+                font-size: .2rem;
+                margin-top: .05rem;
+            }
+            .follow_btn{
+                margin-left: .1rem;
+                background: #06823E;
+                border-radius: .08rem;
+                width: 1rem;
+                height: .48rem;
+                line-height: .48rem;
+                text-align: center;
+                font-size: .24rem;
+            }
+            .follow_btn.active{
+                background: #9CA8A1;
+            }
         }
         .barrage{
             position: absolute;
@@ -274,15 +384,19 @@ export default {
         }
         .more{
             height: 1.04rem;
-            line-height: 1.04rem;
-            font-size: .32rem;
+            font-size: .36rem;
             color: #00c17b;
-            text-align: center;
             background-color: #fff;
             position: absolute;
             bottom: 0;
             left: 0;
             right: 0;
+            img{
+                width: .22rem;
+            }
+            span{
+                margin: 0 .4rem;
+            }
         }
     }
     .player_box{
@@ -291,8 +405,10 @@ export default {
     }
 }
 .room_list{
+    position: relative;
     font-size: 0.32rem;
     flex-wrap: wrap;
+    padding-bottom: 1rem;
     .room{
         position: relative;
         width: 50%;
@@ -302,13 +418,22 @@ export default {
             width: 100%;
             height: 100%;
         }
-        .live_img{
+        .live_box{
             position: absolute;
             left: .2rem;
             top: .2rem;
-            width: 1rem;
-            height: auto;
+            .live_img{
+                width: 1rem;
+            }
+            .r_number{
+                background: fade(hsl(231, 231, 231), 20%);
+                border-radius: .4rem;
+                color: #fff;
+                font-size: .16rem;
+                margin-left: .1rem;
+            }
         }
+        
         .zan_img{
             position: absolute;
             right: .1rem;
@@ -339,6 +464,19 @@ export default {
     .room:nth-child(2n){
         padding-left: .05rem;
     }
+}
+.download_btn{
+    position: absolute;
+    width: 100%;
+    left: 0;
+    bottom: 0;
+    height: 1rem;
+    background: #06823E;
+    color: #fff;
+    line-height: 1rem;
+    text-align: center;
+    z-index: 110;
+    font-size: .36rem;
 }
 
 </style>

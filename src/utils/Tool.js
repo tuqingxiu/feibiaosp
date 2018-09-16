@@ -1,26 +1,15 @@
 /**
- * @author flyerjay
  * 工具类，实现了xhr的get和post方法以及请求的管理（取消，超时，返回码），本地存储，时间格式化，页面路由钩子等方法
  */
 import { Indicator, Toast } from "mint-ui";
-import router from "../router";
-// import store from "../model";
 
 const Tool = {};
-// const target = 'http://47.92.32.44:8091/maintenance-plug/app/';//本地测试环境
-// const target = 'http://10.17.5.162:8080/maintenance-plug/app/';//本地测试环境
-// const target = 'http://47.92.32.44:9990/maintenance-plug/app/';//本地测试环境
-//
-const target = "http://10.0.164.251:8081/maintenance-plug/app/";
-// const target = "https://ssl.mall.changan.com.cn/maintenance-plug/app/";
-// const target = 'http://10.17.12.140:8080/maintenance-plug/app/';//本地测试环境
-// const target = "https://cloud.mall.changan.com.cn/maintenance-plug/app/"; //服务器后端目录
-const imagePath = "http://service.mall.changan.com.cn/static/"; //静态文件目录
+
+const target = "https://cloud.mall.changan.com.cn/main/";
+
 const CLOSE_NETWORK = false; //在本地调试时关闭网络，只调整静态页面
 var requestPool = []; //请求池
 Tool.target = target;
-Tool.imagePath = imagePath;
-Tool.version = "2.0.7"; //增加版本号,现在主要控制引导页的显示，每次更新版本手动更新下这个版本号。
 
 Tool.ajax = function(mySetting) {
   var setting = {
@@ -359,18 +348,6 @@ Tool.extends = function(src, des) {
       }
     }
   }
-};
-/**
- * 路由登录逻辑
- */
-Tool.routerEnter = function(to, from, next) {
-  //确定用户是否已经登陆
-  // if (Tool.localItem("userInfo") && Tool.getUserInfo("userId")) {
-  //   next();
-  // } else {
-  //   store.commit("POP_PAGE", 1); //在进入login之前把已进栈但是没有被访问的页面清理出栈
-  //   next({ name: "login", params: { to: to.path } });
-  // }
 };
 Tool.isWeChat = function() {
   var ua = navigator.userAgent.toLowerCase();
